@@ -8,7 +8,8 @@ const {
   deleteCategory,
 } = require("../controllers/category.controller");
 
-router.get("/", protectAdmin, getCategories);
+// router.get("/", protectAdmin, getCategories);
+router.get("/", getCategories);
 router.post("/", protectAdmin, createCategory);
 router.put("/:id", protectAdmin, updateCategory);
 router.delete("/:id", protectAdmin, deleteCategory);

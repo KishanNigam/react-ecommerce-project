@@ -1,0 +1,17 @@
+.client-header {
+  padding: 16px;
+  background: #111;
+  color: #fff;
+}
+
+.client-header a {
+  color: #fff;
+  margin: 0 8px;
+  text-decoration: none;
+}
+
+.client-footer {
+  padding: 16px;
+  background: #f1f1f1;
+  text-align: center;
+}
