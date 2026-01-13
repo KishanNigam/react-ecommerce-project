@@ -15,3 +15,12 @@
   background: #f1f1f1;
   text-align: center;
 }
+
+/* MAIN PAGE WRAPPER */
+.client-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  min-height: calc(100vh - 120px);
+}
+

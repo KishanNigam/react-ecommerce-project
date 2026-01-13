@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react"; // ✅ useEffect added
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminLayout from "../../components/layout/AdminLayout";
 import { createProduct } from "../../services/product.service";
-import { fetchCategories } from "../../services/category.service"; // ✅ NEW
+import { fetchCategories } from "../../services/category.service";
 import "../../styles/products.css";
 
 function AddProduct() {
@@ -12,22 +12,21 @@ function AddProduct() {
     name: "",
     sku: "",
     price: "",
+    mrp: "", // ✅ NEW
     stock: "",
     category: "",
     status: "Active",
+    description: "", // ✅ NEW
   });
 
-  const [categories, setCategories] = useState([]); // ✅ NEW (safe)
+  const [categories, setCategories] = useState([]);
   const [images, setImages] = useState([]);
   const [previews, setPreviews] = useState([]);
   const [saving, setSaving] = useState(false);
 
-  // ✅ NEW: fetch categories (ONLY Active)
   useEffect(() => {
     fetchCategories().then((data) => {
-      const activeCategories = data.filter(
-        (cat) => cat.status === "Active"
-      );
+      const activeCategories = data.filter((cat) => cat.status === "Active");
       setCategories(activeCategories);
     });
   }, []);
@@ -44,10 +43,7 @@ function AddProduct() {
       return;
     }
     setImages((p) => [...p, ...files]);
-    setPreviews((p) => [
-      ...p,
-      ...files.map((f) => URL.createObjectURL(f)),
-    ]);
+    setPreviews((p) => [...p, ...files.map((f) => URL.createObjectURL(f))]);
   };
 
   const removeImage = (idx) => {
@@ -64,13 +60,14 @@ function AddProduct() {
       fd.append("name", formData.name);
       fd.append("sku", formData.sku);
       fd.append("price", Number(formData.price));
+      fd.append("mrp", Number(formData.mrp)); // ✅ NEW
       fd.append("stock", Number(formData.stock));
       fd.append("category", formData.category);
       fd.append("status", formData.status);
+      fd.append("description", formData.description); // ✅ NEW
       images.forEach((img) => fd.append("images", img));
 
       await createProduct(fd);
-
       navigate("/admin/products", { state: { productAdded: true } });
     } catch (err) {
       console.error(err);
@@ -97,19 +94,25 @@ function AddProduct() {
 
             <div className="form-group">
               <label>SKU</label>
+              <input name="sku" value={formData.sku} onChange={handleChange} />
+            </div>
+
+            <div className="form-group">
+              <label>Selling Price (₹)</label>
               <input
-                name="sku"
-                value={formData.sku}
+                type="number"
+                name="price"
+                value={formData.price}
                 onChange={handleChange}
               />
             </div>
 
             <div className="form-group">
-              <label>Price</label>
+              <label>MRP (₹)</label>
               <input
                 type="number"
-                name="price"
-                value={formData.price}
+                name="mrp"
+                value={formData.mrp}
                 onChange={handleChange}
               />
             </div>
@@ -124,7 +127,6 @@ function AddProduct() {
               />
             </div>
 
-            {/* 🔥 ONLY THIS PART CHANGED */}
             <div className="form-group">
               <label>Category</label>
               <select
@@ -154,10 +156,18 @@ function AddProduct() {
               </select>
             </div>
 
-            <div
-              className="form-group"
-              style={{ gridColumn: "span 2" }}
-            >
+            <div className="form-group" style={{ gridColumn: "span 2" }}>
+              <label>Description (About this item)</label>
+              <textarea
+                name="description"
+                rows={4}
+                value={formData.description}
+                onChange={handleChange}
+                placeholder="Enter product details..."
+              />
+            </div>
+
+            <div className="form-group" style={{ gridColumn: "span 2" }}>
               <label>Product Images (max 5)</label>
               <input
                 type="file"
@@ -175,10 +185,7 @@ function AddProduct() {
                 {previews.map((src, i) => (
                   <div className="image-preview" key={i}>
                     <img src={src} alt="preview" />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(i)}
-                    >
+                    <button type="button" onClick={() => removeImage(i)}>
                       ✕
                     </button>
                   </div>
@@ -187,11 +194,7 @@ function AddProduct() {
             )}
 
             <div className="form-actions">
-              <button
-                className="btn-primary"
-                type="submit"
-                disabled={saving}
-              >
+              <button className="btn-primary" type="submit" disabled={saving}>
                 {saving ? "Saving..." : "Save Product"}
               </button>
               <button

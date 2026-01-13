@@ -2,6 +2,9 @@ const mongoose = require("mongoose");
 
 const productSchema = new mongoose.Schema(
   {
+    /* =========================
+       BASIC INFO
+    ========================= */
     name: {
       type: String,
       required: true,
@@ -11,16 +14,6 @@ const productSchema = new mongoose.Schema(
     sku: {
       type: String,
       trim: true,
-    },
-
-    price: {
-      type: Number,
-      required: true,
-    },
-
-    stock: {
-      type: Number,
-      default: 0,
     },
 
     category: {
@@ -34,9 +27,38 @@ const productSchema = new mongoose.Schema(
       default: "Active",
     },
 
-    // 🔥 NEW FIELD — PRODUCT IMAGES
+    /* =========================
+       PRICING & STOCK
+    ========================= */
+    price: {
+      type: Number, // selling price
+      required: true,
+    },
+
+    mrp: {
+      type: Number, // actual / original price
+      default: 0,
+    },
+
+    stock: {
+      type: Number,
+      default: 0,
+    },
+
+    /* =========================
+       DESCRIPTION
+    ========================= */
+    description: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    /* =========================
+       IMAGES
+    ========================= */
     images: {
-      type: [String], // array of image URLs
+      type: [String],
       default: [],
     },
   },
@@ -45,7 +67,7 @@ const productSchema = new mongoose.Schema(
   }
 );
 
-// ✅ SAFE EXPORT (overwrite error avoid)
+// ✅ SAFE EXPORT (avoid overwrite error)
 module.exports =
   mongoose.models.Product ||
   mongoose.model("Product", productSchema);

@@ -10,7 +10,8 @@ const {
   deleteProduct,
 } = require("../controllers/product.controller");
 
-router.get("/", protectAdmin, getAllProducts);
+// router.get("/", protectAdmin, getAllProducts);
+router.get("/", getAllProducts);
 router.post("/", protectAdmin, upload.array("images", 5), createProduct);
 router.put("/:id", protectAdmin, upload.array("images", 5), updateProduct);
 router.delete("/:id", protectAdmin, deleteProduct);

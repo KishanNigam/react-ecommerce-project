@@ -8,9 +8,12 @@ function MainLayout() {
   return (
     <>
       <Header />
-      <main style={{ minHeight: "80vh", padding: "20px" }}>
+
+      {/* MAIN CONTENT WRAPPER */}
+      <main className="client-main">
         <Outlet />
       </main>
+
       <Footer />
     </>
   );

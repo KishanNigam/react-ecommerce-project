@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import AdminLayout from "../../components/layout/AdminLayout";
 import { fetchProducts, updateProduct } from "../../services/product.service";
-import { fetchCategories } from "../../services/category.service"; // ✅ NEW
+import { fetchCategories } from "../../services/category.service";
 import "../../styles/products.css";
 
 function EditProduct() {
@@ -10,7 +10,7 @@ function EditProduct() {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState(null);
-  const [categories, setCategories] = useState([]); // ✅ NEW
+  const [categories, setCategories] = useState([]);
 
   const [existingImages, setExistingImages] = useState([]);
   const [removedImages, setRemovedImages] = useState([]);
@@ -18,7 +18,6 @@ function EditProduct() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    // 🔹 Load product (OLD WORKING LOGIC)
     fetchProducts().then((data) => {
       const product = data.products.find((p) => p._id === id);
       if (product) {
@@ -27,11 +26,8 @@ function EditProduct() {
       }
     });
 
-    // 🔹 Load categories (ONLY Active)
     fetchCategories().then((data) => {
-      const active = data.filter(
-        (cat) => cat.status === "Active"
-      );
+      const active = data.filter((cat) => cat.status === "Active");
       setCategories(active);
     });
   }, [id]);
@@ -60,9 +56,11 @@ function EditProduct() {
     fd.append("name", formData.name);
     fd.append("sku", formData.sku);
     fd.append("price", formData.price);
+    fd.append("mrp", formData.mrp || 0); // ✅ NEW
     fd.append("stock", formData.stock);
     fd.append("category", formData.category);
     fd.append("status", formData.status);
+    fd.append("description", formData.description || ""); // ✅ NEW
     fd.append("removedImages", JSON.stringify(removedImages));
     newImages.forEach((img) => fd.append("images", img));
 
@@ -80,7 +78,6 @@ function EditProduct() {
 
         <div className="products-table-card">
           <form className="product-form" onSubmit={handleSubmit}>
-            {/* BASIC INFO */}
             <div className="form-group">
               <label>Product Name</label>
               <input
@@ -92,19 +89,25 @@ function EditProduct() {
 
             <div className="form-group">
               <label>SKU</label>
+              <input name="sku" value={formData.sku} onChange={handleChange} />
+            </div>
+
+            <div className="form-group">
+              <label>Selling Price (₹)</label>
               <input
-                name="sku"
-                value={formData.sku}
+                type="number"
+                name="price"
+                value={formData.price}
                 onChange={handleChange}
               />
             </div>
 
             <div className="form-group">
-              <label>Price (₹)</label>
+              <label>MRP (₹)</label>
               <input
                 type="number"
-                name="price"
-                value={formData.price}
+                name="mrp"
+                value={formData.mrp || ""}
                 onChange={handleChange}
               />
             </div>
@@ -119,7 +122,6 @@ function EditProduct() {
               />
             </div>
 
-            {/* 🔥 ONLY CHANGE: CATEGORY DROPDOWN */}
             <div className="form-group">
               <label>Category</label>
               <select
@@ -149,7 +151,16 @@ function EditProduct() {
               </select>
             </div>
 
-            {/* EXISTING IMAGES */}
+            <div className="form-group" style={{ gridColumn: "span 2" }}>
+              <label>Description (About this item)</label>
+              <textarea
+                name="description"
+                rows={4}
+                value={formData.description || ""}
+                onChange={handleChange}
+              />
+            </div>
+
             <div className="form-group" style={{ gridColumn: "span 2" }}>
               <label>Existing Images</label>
               {existingImages.length === 0 && (
@@ -158,10 +169,7 @@ function EditProduct() {
               <div className="image-preview-grid">
                 {existingImages.map((img) => (
                   <div className="image-preview" key={img}>
-                    <img
-                      src={`http://localhost:5000${img}`}
-                      alt=""
-                    />
+                    <img src={`http://localhost:5000${img}`} alt="" />
                     <button
                       type="button"
                       onClick={() => removeExistingImage(img)}
@@ -173,20 +181,16 @@ function EditProduct() {
               </div>
             </div>
 
-            {/* ADD NEW IMAGES */}
             <div className="form-group" style={{ gridColumn: "span 2" }}>
               <label>Add New Images</label>
               <input
                 type="file"
                 multiple
                 accept="image/*"
-                onChange={(e) =>
-                  setNewImages(Array.from(e.target.files))
-                }
+                onChange={(e) => setNewImages(Array.from(e.target.files))}
               />
             </div>
 
-            {/* ACTIONS */}
             <div className="form-actions">
               <button className="btn-primary" disabled={saving}>
                 {saving ? "Updating..." : "Update Product"}
